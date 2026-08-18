@@ -1,0 +1,1188 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Straight to the Recipe</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Spectral:ital,wght@0,400;0,500;0,600;1,400&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --paper:#f5f4ee;
+    --ink:#232520;
+    --ink-soft:#6b6f66;
+    --accent:#4b6043;
+    --spice:#b5652d;
+    --line:#dfdccf;
+    --card:#ffffff;
+  }
+
+  *{margin:0;padding:0;box-sizing:border-box;}
+  html{scroll-behavior:smooth;}
+
+  body{
+    background:var(--paper);
+    color:var(--ink);
+    font-family:'Inter',sans-serif;
+    line-height:1.55;
+    -webkit-font-smoothing:antialiased;
+  }
+
+  a{color:inherit;text-decoration:none;}
+  ul{list-style:none;}
+  button{font:inherit;background:none;border:none;cursor:pointer;color:inherit;}
+
+  .mono{
+    font-family:'JetBrains Mono',monospace;
+    font-size:0.72rem;
+    letter-spacing:0.08em;
+    text-transform:uppercase;
+  }
+
+  /* Header */
+  header{
+    padding:2.75rem 1.75rem 2rem;
+    max-width:920px;
+    margin:0 auto;
+    border-bottom:1px solid var(--line);
+  }
+
+  header .top-row{
+    display:flex;
+    align-items:baseline;
+    justify-content:space-between;
+    flex-wrap:wrap;
+    gap:0.75rem;
+  }
+
+  .site-name{
+    font-family:'Spectral',serif;
+    font-size:1.7rem;
+    font-weight:600;
+  }
+
+  .site-name a{cursor:pointer;}
+
+  .tagline{
+    color:var(--ink-soft);
+    font-size:0.95rem;
+  }
+
+  .tagline strong{color:var(--accent);font-weight:600;}
+
+  /* Filter row */
+  .filters{
+    margin-top:1.75rem;
+    display:flex;
+    flex-wrap:wrap;
+    gap:0.6rem;
+  }
+
+  .filters button{
+    font-family:'JetBrains Mono',monospace;
+    font-size:0.72rem;
+    letter-spacing:0.06em;
+    text-transform:uppercase;
+    padding:0.4rem 0.85rem;
+    border:1px solid var(--line);
+    border-radius:100px;
+    color:var(--ink-soft);
+    transition:all 0.15s ease;
+  }
+
+  .filters button:hover{border-color:var(--accent);color:var(--accent);}
+
+  .filters button.active{
+    background:var(--ink);
+    border-color:var(--ink);
+    color:var(--paper);
+  }
+
+  .add-btn{
+    border:1px solid var(--ink);
+    padding:0.45rem 0.9rem;
+    border-radius:100px;
+    transition:all 0.15s ease;
+  }
+
+  .add-btn:hover{background:var(--ink);color:var(--paper);}
+
+  /* Add-recipe form */
+  #add-view{display:none;max-width:640px;}
+  #add-view.active{display:block;}
+
+  .form-heading{
+    font-family:'Spectral',serif;
+    font-size:1.8rem;
+    font-weight:600;
+    margin-bottom:0.5rem;
+  }
+
+  .form-sub{
+    color:var(--ink-soft);
+    font-size:0.95rem;
+    max-width:52ch;
+    margin-bottom:2rem;
+  }
+
+  .field{margin-bottom:1.4rem;}
+
+  .field label{
+    display:block;
+    margin-bottom:0.4rem;
+  }
+
+  .field input, .field select, .field textarea{
+    width:100%;
+    font-family:'Inter',sans-serif;
+    font-size:0.95rem;
+    padding:0.6rem 0.75rem;
+    border:1px solid var(--line);
+    border-radius:4px;
+    background:var(--card);
+    color:var(--ink);
+  }
+
+  .field input:focus, .field select:focus, .field textarea:focus{
+    outline:none;
+    border-color:var(--accent);
+  }
+
+  .field textarea{resize:vertical;min-height:5.5rem;line-height:1.5;}
+
+  .field-hint{color:var(--ink-soft);font-size:0.82rem;margin-top:0.35rem;}
+
+  .field-row{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:1rem;
+  }
+
+  .generate-btn{
+    margin-top:0.5rem;
+    padding:0.75rem 1.5rem;
+    background:var(--accent);
+    color:#fff;
+    border-radius:4px;
+    font-weight:500;
+    transition:opacity 0.15s ease;
+  }
+
+  .generate-btn:hover{opacity:0.9;}
+
+  .snippet-box{
+    display:none;
+    margin-top:2rem;
+  }
+
+  .snippet-box.visible{display:block;}
+
+  .snippet-label{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    margin-bottom:0.6rem;
+  }
+
+  .copy-btn{
+    font-family:'JetBrains Mono',monospace;
+    font-size:0.72rem;
+    text-transform:uppercase;
+    letter-spacing:0.06em;
+    padding:0.35rem 0.75rem;
+    border:1px solid var(--ink);
+    border-radius:100px;
+  }
+
+  .copy-btn:hover{background:var(--ink);color:var(--paper);}
+
+  pre.snippet{
+    background:var(--ink);
+    color:#e8e6dd;
+    padding:1.25rem;
+    border-radius:6px;
+    font-family:'JetBrains Mono',monospace;
+    font-size:0.8rem;
+    line-height:1.6;
+    overflow-x:auto;
+    white-space:pre-wrap;
+    word-break:break-word;
+  }
+
+  .snippet-hint{
+    margin-top:0.9rem;
+    color:var(--ink-soft);
+    font-size:0.85rem;
+  }
+
+  main{
+    max-width:920px;
+    margin:0 auto;
+    padding:2.5rem 1.75rem 5rem;
+  }
+
+  /* Recipe grid */
+  .grid{
+    display:grid;
+    grid-template-columns:repeat(auto-fill, minmax(260px, 1fr));
+    gap:1.75rem;
+  }
+
+  .no-results{
+    color:var(--ink-soft);
+    font-size:0.95rem;
+    padding:2rem 0;
+  }
+
+  .card{
+    display:block;
+    cursor:pointer;
+    background:var(--card);
+    border:1px solid var(--line);
+    border-radius:6px;
+    overflow:hidden;
+    transition:transform 0.18s ease, box-shadow 0.18s ease;
+  }
+
+  .card:hover{
+    transform:translateY(-3px);
+    box-shadow:0 8px 20px rgba(35,37,32,0.08);
+  }
+
+  .card-image{
+    height:150px;
+    background:linear-gradient(135deg, var(--accent), #7a8f6e);
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    font-family:'Spectral',serif;
+    font-style:italic;
+    color:rgba(255,255,255,0.85);
+    font-size:0.85rem;
+  }
+
+  .card-body{padding:1.1rem 1.15rem 1.3rem;}
+
+  .card-cat{
+    color:var(--spice);
+    margin-bottom:0.5rem;
+    display:block;
+  }
+
+  .card-title{
+    font-family:'Spectral',serif;
+    font-size:1.2rem;
+    font-weight:600;
+    line-height:1.3;
+    margin-bottom:0.6rem;
+  }
+
+  .card-meta{
+    display:flex;
+    gap:0.9rem;
+    color:var(--ink-soft);
+  }
+
+  /* Recipe detail view */
+  #recipe-view{display:none;}
+  #recipe-view.active{display:block;}
+  #home-view.hidden{display:none;}
+
+  .back-link{
+    display:inline-flex;
+    align-items:center;
+    gap:0.4rem;
+    color:var(--ink-soft);
+    margin-bottom:2rem;
+    transition:color 0.15s ease;
+  }
+
+  .back-link:hover{color:var(--accent);}
+
+  .recipe-cat{color:var(--spice);display:block;margin-bottom:0.6rem;}
+
+  .recipe-title{
+    font-family:'Spectral',serif;
+    font-size:clamp(1.9rem, 4vw, 2.6rem);
+    font-weight:600;
+    line-height:1.2;
+    max-width:20ch;
+  }
+
+  .recipe-note{
+    margin-top:1rem;
+    color:var(--ink-soft);
+    font-size:0.98rem;
+    max-width:56ch;
+  }
+
+  .meta-bar{
+    margin-top:1.75rem;
+    display:flex;
+    flex-wrap:wrap;
+    gap:1.75rem;
+    padding:1.1rem 0;
+    border-top:1px solid var(--line);
+    border-bottom:1px solid var(--line);
+  }
+
+  .meta-bar div dt{color:var(--ink-soft);margin-bottom:0.2rem;}
+  .meta-bar div dd{font-family:'Spectral',serif;font-size:1.05rem;font-weight:500;}
+
+  .recipe-body{
+    margin-top:2.5rem;
+    display:grid;
+    grid-template-columns:260px 1fr;
+    gap:3rem;
+    align-items:start;
+  }
+
+  .ingredients-panel{
+    position:sticky;
+    top:1.5rem;
+    background:var(--card);
+    border:1px solid var(--line);
+    border-radius:6px;
+    padding:1.5rem;
+  }
+
+  .panel-heading{
+    font-family:'Spectral',serif;
+    font-weight:600;
+    font-size:1.1rem;
+    margin-bottom:1rem;
+  }
+
+  .ingredient-item{
+    display:flex;
+    align-items:flex-start;
+    gap:0.65rem;
+    padding:0.5rem 0;
+    border-top:1px solid var(--line);
+    font-size:0.93rem;
+  }
+
+  .ingredient-item:first-of-type{border-top:none;}
+
+  .ingredient-item input[type="checkbox"]{
+    margin-top:0.2rem;
+    width:15px;
+    height:15px;
+    accent-color:var(--accent);
+    flex-shrink:0;
+  }
+
+  .ingredient-item label{cursor:pointer;}
+
+  .ingredient-item.checked label{
+    color:var(--ink-soft);
+    text-decoration:line-through;
+  }
+
+  .steps-heading{
+    font-family:'Spectral',serif;
+    font-weight:600;
+    font-size:1.1rem;
+    margin-bottom:1.25rem;
+  }
+
+  .steps{counter-reset:step;}
+
+  .step{
+    display:grid;
+    grid-template-columns:2.2rem 1fr;
+    gap:0.5rem;
+    padding:1.1rem 0;
+    border-top:1px solid var(--line);
+  }
+
+  .step:first-child{border-top:none;padding-top:0;}
+
+  .step-num{
+    counter-increment:step;
+    font-family:'JetBrains Mono',monospace;
+    font-size:0.85rem;
+    color:var(--accent);
+  }
+
+  .step-num::before{content:counter(step, decimal-leading-zero);}
+
+  .step-text{font-size:0.98rem;}
+
+  .notes-box{
+    margin-top:2.5rem;
+    padding:1.25rem 1.5rem;
+    background:var(--card);
+    border:1px solid var(--line);
+    border-left:3px solid var(--spice);
+    border-radius:4px;
+    font-size:0.93rem;
+    color:var(--ink-soft);
+  }
+
+  .notes-box strong{color:var(--ink);}
+
+  footer{
+    max-width:920px;
+    margin:0 auto;
+    padding:2rem 1.75rem 3rem;
+    color:var(--ink-soft);
+  }
+
+  /* Mobile */
+  @media (max-width:720px){
+    .recipe-body{grid-template-columns:1fr;}
+    .ingredients-panel{position:static;}
+    .meta-bar{gap:1.2rem;}
+  }
+
+  @media (prefers-reduced-motion: reduce){
+    html{scroll-behavior:auto;}
+    *{transition:none !important;}
+  }
+
+  a:focus-visible, button:focus-visible{
+    outline:2px solid var(--accent);
+    outline-offset:2px;
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="top-row">
+    <div class="site-name"><a onclick="showHome()">Straight to the Recipe</a></div>
+    <div class="tagline">No ads. No life story. <strong>Just recipes.</strong></div>
+    <button class="add-btn mono" onclick="showAddForm()">+ Add recipe</button>
+  </div>
+  <div class="filters" id="filters"></div>
+
+<div class="search-container">
+  <form id="search-form">
+    <input type="search" id="search-input" name="q" placeholder="Search here..." aria-label="Search">
+    <button type="submit">Search</button>
+  </form>
+</div>
+
+<style>
+  .search-container {
+    margin-top: 20px;
+}
+
+
+  .search-container form {
+    display: flex;
+    max-width: 400px;
+    width: 100%;
+  }
+
+  .search-container input[type="search"] {
+    flex: 1;
+    padding: 10px 15px;
+    font-size: 12px;
+    border: 2px solid #ccc;
+    border-right: none;
+    border-radius: 4px 0 0 4px;
+    outline: none;
+
+ font-family: 'JetBrains Mono', monospace;
+    font-size: 0.72rem;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+  
+  }
+
+  .search-container input[type="search"]:focus {
+    border-color: #537A51;
+
+
+
+  }
+
+  .search-container button {
+    padding: 10px 20px;
+    font-size: 16px;
+    background-color: #537A51;
+    color: white;
+    border: 2px solid #537A51;
+    border-radius: 0 4px 4px 0;
+    cursor: pointer;
+
+font-family: 'JetBrains Mono', monospace;
+    font-size: 0.72rem;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+  }
+
+  .search-container button:hover {
+    background-color: #40543E;
+    border-color: #40543E;
+  }
+</style>
+
+
+
+</header>
+
+<main>
+
+  <div id="home-view">
+    <div class="grid" id="grid"></div>
+  </div>
+
+  <div id="recipe-view">
+    <a class="back-link mono" onclick="showHome()">← All recipes</a>
+    <span class="recipe-cat mono" id="r-cat"></span>
+    <h1 class="recipe-title" id="r-title"></h1>
+    <p class="recipe-note" id="r-note"></p>
+
+    <dl class="meta-bar">
+      <div><dt class="mono">Prep</dt><dd id="r-prep"></dd></div>
+      <div><dt class="mono">Cook</dt><dd id="r-cook"></dd></div>
+      <div><dt class="mono">Serves</dt><dd id="r-serves"></dd></div>
+      <div><dt class="mono">Difficulty</dt><dd id="r-diff"></dd></div>
+    </dl>
+
+    <div class="recipe-body">
+      <div class="ingredients-panel">
+        <div class="panel-heading">Ingredients</div>
+        <div id="r-ingredients"></div>
+      </div>
+      <div>
+        <div class="steps-heading">Method</div>
+        <div class="steps" id="r-steps"></div>
+        <div class="notes-box" id="r-notes-box" style="display:none;">
+          <strong>Note —</strong> <span id="r-notes"></span>
+        </div>
+      </div>
+    </div>
+    </div>
+
+  <div id="add-view">
+    <a class="back-link mono" onclick="showHome()">← All recipes</a>
+    <div class="form-heading">Add a recipe</div>
+    <p class="form-sub">Fill this in and it'll generate a code snippet below — paste that into the <code>recipes</code> list near the bottom of the file and save. That's it.</p>
+
+    <div class="field">
+      <label class="mono">Title</label>
+      <input type="text" id="f-title" placeholder="Weeknight Chickpea Curry">
+    </div>
+
+    <div class="field-row">
+      <div class="field">
+        <label class="mono">Category</label>
+        <input type="text" id="f-category" placeholder="Dinner">
+      </div>
+      <div class="field">
+        <label class="mono">Difficulty</label>
+        <input type="text" id="f-difficulty" placeholder="Easy">
+      </div>
+    </div>
+
+    <div class="field">
+      <label class="mono">One-line description</label>
+      <input type="text" id="f-note" placeholder="A pantry curry that comes together in one pot.">
+    </div>
+
+    <div class="field-row">
+      <div class="field">
+        <label class="mono">Prep time</label>
+        <input type="text" id="f-prep" placeholder="10 min">
+      </div>
+      <div class="field">
+        <label class="mono">Cook time</label>
+        <input type="text" id="f-cook" placeholder="25 min">
+      </div>
+    </div>
+
+    <div class="field">
+      <label class="mono">Serves</label>
+      <input type="text" id="f-serves" placeholder="4">
+    </div>
+
+    <div class="field">
+      <label class="mono">Ingredients</label>
+      <textarea id="f-ingredients" placeholder="One per line, e.g.&#10;2 tbsp olive oil&#10;1 onion, diced"></textarea>
+      <div class="field-hint">One ingredient per line.</div>
+    </div>
+
+    <div class="field">
+      <label class="mono">Method</label>
+      <textarea id="f-steps" placeholder="One step per line, in order."></textarea>
+      <div class="field-hint">One step per line — they'll be numbered automatically.</div>
+    </div>
+
+    <div class="field">
+      <label class="mono">Notes (optional)</label>
+      <input type="text" id="f-notes" placeholder="A swap, a tip, a variation.">
+    </div>
+
+    <button class="generate-btn" onclick="generateSnippet()">Generate code snippet</button>
+
+    <div class="snippet-box" id="snippet-box">
+      <div class="snippet-label">
+        <span class="mono">Paste this into the recipes array</span>
+        <button class="copy-btn" onclick="copySnippet()">Copy</button>
+      </div>
+      <pre class="snippet" id="snippet-output"></pre>
+      <div class="snippet-hint">Open the file, find <code>const recipes = [</code> near the bottom, and paste this as a new entry inside the brackets.</div>
+    </div>
+  </div>
+
+</main>
+
+<footer class="mono">© 2026 · Recipes only, we promise.</footer>
+
+<script>
+const recipes = [
+  {
+    id: "chickpea-curry",
+    title: "Weeknight Chickpea Curry",
+    category: "Asian",
+    note: "A pantry curry that comes together in one pot, mostly from cans and a jar of curry paste.",
+    prep: "10 min", cook: "25 min", serves: "4", difficulty: "Easy",
+    ingredients: [
+      "2 tbsp neutral oil","1 onion, diced","3 garlic cloves, minced","1 tbsp grated ginger",
+      "2 tbsp red curry paste","2 cans chickpeas, drained","1 can crushed tomatoes","1 can coconut milk",
+      "2 cups spinach","Salt to taste","Cooked rice, to serve"
+    ],
+    steps: [
+      "Heat the oil in a large pot over medium heat. Add the onion and cook until soft, about 5 minutes.",
+      "Add the garlic, ginger, and curry paste. Cook for 1 minute until fragrant.",
+      "Stir in the chickpeas, tomatoes, and coconut milk. Simmer uncovered for 15 minutes.",
+      "Fold in the spinach until wilted. Season with salt and serve over rice."
+    ],
+    notes: "Swap chickpeas for lentils or tofu if that's what's on hand."
+  },
+  {
+    id: "blueberry-oatmeal",
+    title: "Blueberry Baked Oatmeal",
+    category: "Breakfast",
+    note: "A make-ahead breakfast that reheats well all week. Barely sweet, mostly oats and berries.",
+    prep: "10 min", cook: "35 min", serves: "6", difficulty: "Easy",
+    ingredients: [
+      "2 cups rolled oats","1 tsp baking powder","1 tsp cinnamon","1/2 tsp salt",
+      "2 cups milk of choice","1 egg","1/3 cup maple syrup","1 tsp vanilla extract",
+      "2 cups blueberries, fresh or frozen"
+    ],
+    steps: [
+      "Preheat the oven to 375°F (190°C) and grease a baking dish.",
+      "Whisk the oats, baking powder, cinnamon, and salt in a bowl.",
+      "In a separate bowl, whisk the milk, egg, maple syrup, and vanilla.",
+      "Combine wet and dry ingredients, fold in most of the blueberries, and pour into the dish. Scatter the remaining berries on top.",
+      "Bake for 35 minutes until set and golden. Cool slightly before serving."
+    ],
+    notes: "Freezes well in individual portions — reheat straight from frozen."
+  },
+  {
+    id: "lemon-ricotta-pasta",
+    title: "Lemon Ricotta Pasta",
+    category: "Pasta",
+    note: "Ten minutes, one pot for the pasta, and pantry staples for the rest.",
+    prep: "5 min", cook: "12 min", serves: "3", difficulty: "Easy",
+    ingredients: [
+      "12 oz short pasta","1 cup ricotta","Zest and juice of 1 lemon","1/2 cup parmesan, grated",
+      "2 tbsp olive oil","Cracked black pepper","Salt to taste","Basil leaves, to serve"
+    ],
+    steps: [
+      "Cook the pasta in well-salted water until al dente. Reserve 1 cup of the pasta water before draining.",
+      "While the pasta cooks, whisk the ricotta, lemon zest, lemon juice, parmesan, and olive oil in a large bowl.",
+      "Add the drained pasta to the ricotta mixture, loosening with splashes of pasta water until glossy and coating the noodles.",
+      "Season with salt and pepper, top with basil and extra parmesan."
+    ],
+    notes: "Add a handful of arugula at the end for a little bitterness."
+  },
+    {
+    id: "creamy-one-pot-green-pasta",
+    title: "Creamy One Pot Green Pasta",
+    category: "Pasta",
+    note: "A delicious one-pot recipe featuring green veggies, pesto, and rigatoni.",
+    prep: "10 min", cook: "15 min", serves: "4", difficulty: "Medium",
+    ingredients: [
+      "16oz rigatoni",
+      "3 3/4 cups vegetable broth",
+      "1 1/2 cups broccoli, chopped",
+      "1 cup frozen peas",
+      "1 handful spinach",
+      "1 handful basil leaves, chopped",
+      "1 cup zucchini, grated",
+      "1/3 cup pesto",
+      "1/2 cup cream",
+      "1 lemon, juiced",
+      "salt and pepper",
+      "1 tbsp cream cheese"
+    ],
+    steps: [
+      "Add the pasta to a large saucepan and pour over the vegetable broth. Bring to a boil over high heat, and then lower to medium-low and simmer for 5 to 8 minutes, until the pasta has absorbed some of the water and is half cooked.",
+      "Add the vegetables, cream, and pesto. Cover, and cook for an additional 8 minutes, until the pasta is cooked and the sauce is creamy. You can add an additional tablespoon of cream cheese if you want a creamier pasta."
+    ],
+    notes: ""
+  },
+
+  {
+    id: "orecchiette-with-chili-crisp-and-broccolini",
+    title: "Orecchiette with chili crisp and broccolini",
+    category: "Pasta",
+    note: "Easy weeknight pasta.",
+    prep: "5 min", cook: "15 min", serves: "4", difficulty: "Easy",
+    ingredients: [
+      "1 lb orecchiette",
+      "2 tbsp chili crisp",
+      "1 can chickpeas, drained and rinsed",
+      "1 qt vegetable broth",
+      "1 bunch broccolini, ends trimmed and chopped",
+      "1/4 cup grated parmesan"
+    ],
+    steps: [
+      "To a large nonstick skillet over medium, add a drizzle of olive oil, the pasta, and the chili crisp and toast for 2-3 minutes, until slightly browned around the edges.",
+      "Add chickpeas, broth, 1 1/2 cups of water and a pinch of salt. Bring to a simmer and stir frequently until the pasta is mostly cooked, about 7 minutes.",
+      "Add broccolini and steam, covered, for 3 minutes. Finish with parmesan and more chili crisp, if desired."
+    ],
+    notes: ""
+  },
+
+  {
+    id: "one-pot-rigatoni",
+    title: "One Pot Rigatoni",
+    category: "Pasta",
+    note: "Super easy and flavorful, with minimal chopping.",
+    prep: "10 min", cook: "13 min", serves: "8", difficulty: "Easy",
+    ingredients: [
+      "1 tablespoon unsalted butter",
+      "1 small diced shallot",
+      "5 cloves minced garlic",
+      "2 teaspoons crushed red pepper",
+      "16 ounces rigatoni",
+      "20 ounces  marinara sauce",
+      "4 cups vegetable broth",
+      "1 teaspoon kosher salt",
+      "3/4 cup heavy cream",
+      "1/2 cup Parmesan cheese shavings",
+      "1 cup cooked green peas"
+    ],
+    steps: [
+      "Place the butter in a pot or Dutch oven over medium-high heat. As the butter is melting, add the shallots and garlic to the pan.",
+      "Sprinkle in the red chili flake and mix together. Allow the shallots and garlic to soften in the pan by cooking for 1-2 minutes. Be sure to mix often so that the garlic and shallots don't stick to the pan or burn.",
+      "Add the pasta to the hot pan, followed by the marinara sauce, broth, and salt. Mix it all together and bring it up to a soft boil to cook the pasta. Cover and reduce the heat to medium-low for about 12-13 minutes.",
+      "When the rigatoni is cooked to perfection, add the heavy cream, peas, and Parmesan to the pasta. Mix it together over medium heat until the sauce comes together. Serve immediately. Feel free to garnish with fresh herbs and a sprinkle of Parmesan!"
+    ],
+    notes: ""
+  },
+
+  {
+    id: "easy-orzo-pasta",
+    title: "Easy Orzo Pasta",
+    category: "Pasta",
+    note: "Orzo, tomatoes, basil, parmesan, and lots of garlic!",
+    prep: "5 min", cook: "15 min", serves: "4", difficulty: "Easy",
+    ingredients: [
+      "8 ounces dry orzo pasta",
+      "3 tablespoons olive oil",
+      "1 tablespoon minced garlic, 3 to 4 cloves",
+      "¼ teaspoon crushed red pepper flakes, or more to taste",
+      "2 medium tomatoes, chopped",
+      "½ cup grated parmesan cheese, plus more for serving",
+      "1 cup basil leaves, torn into pieces",
+      "Salt and fresh ground black pepper"
+    ],
+    steps: [
+      "Bring a large pot of salted water to a boil. Add the orzo and cook according to the package directions (usually 8 to 10 minutes). Before draining the cooked pasta, reserve ⅓ cup of the pasta water (you will use this to make the sauce).",
+      "Add olive oil, garlic, and red pepper flakes to a large, deep skillet and place over medium heat.",
+      "When the oil begins to bubble around the garlic, add the cooked pasta, tomatoes, basil, and parmesan cheese.",
+      "Add 3 tablespoons of the reserved pasta water and cook, stirring often, for one minute. Over the minute, the liquid in the pan should begin to coat the pasta. If it seems dry, add a splash more of the reserved pasta water and cook for a few more seconds.",
+      "Taste for seasoning and adjust with a bit of salt if needed. Serve with extra basil, parmesan, and fresh ground black pepper on top."
+    ],
+    notes: "Optionally, add in spinach or a splash of cream at the end."
+  },
+
+  {
+    id: "spaghetti-with-chickpeas-in-lemon-tahini-sauce",
+    title: "Spaghetti with Chickpeas in Lemon Tahini Sauce",
+    category: "Pasta",
+    note: "",
+    prep: "5 min", cook: "15 min", serves: "4", difficulty: "Easy",
+    ingredients: [
+      "15-oz. can chickpeas, rinsed and drained",
+      "2 tablespoons olive oil",
+      "1 teaspoon smoked paprika",
+      "1/2 teaspoon salt",
+      "1 lb spaghetti",
+      "2 tablespoons olive oil",
+      "1/4 cup tahini",
+      "juice of 2 lemons",
+      "kosher salt and freshly ground pepper, to taste",
+      "1/2 teaspoon smoked paprika, to serve"
+    ],
+    steps: [
+      "Preheat oven to 400°F. In a medium mixing bowl, toss chickpeas, olive oil, smoked paprika, and salt, until chickpeas are evenly coated. Spread the chickpeas evenly on a rimmed baking sheet. Roast in a 400°F oven until browned and crisp, about 15 minutes.",
+      "Cook spaghetti according to package directions, until al dente. Drain through a colander, reserving about a cup of the pasta water.",
+      "In a large skillet over low heat, heat olive oil, then add add tahini. Vigorously whisk the mixture until it is combined and smooth, and make sure the heat is low or the tahini will scorch and burn. Add the cooked pasta and 1/4 cup of the reserved pasta water, and toss to coat the pasta with the sauce. Season with salt and pepper, add half the chickpeas, and continue to toss the pasta for about 30 seconds, adding more pasta water as needed (the noodles will absorb a lot of the sauce). Remove skillet from heat, then add the juice of 2 lemons and stir to combine.",
+      "To serve, sprinkle with the remaining chickpeas and 1/2 teaspoon smoked paprika."
+    ],
+    notes: ""
+  },
+
+  {
+    id: "skinny-fettuccine-alfredo",
+    title: "Skinny Fettuccine Alfredo",
+    category: "Pasta",
+    note: "Just as delicious and creamy as ever!",
+    prep: "5 min", cook: "20 min", serves: "4", difficulty: "Easy",
+    ingredients: [
+      "12 ounces fettuccine (or any pasta shape)",
+      "1 Tablespoon extra virgin olive oil or butter",
+      "4 cloves garlic, pressed or finely-minced",
+      "3 Tablespoons all-purpose flour",
+      "1 cup vegetable stock",
+      "1 cup milk",
+      "3/4 cup freshly-grated Parmesan cheese",
+      "1/2 teaspoon salt",
+      "1/4 teaspoon black pepper"
+    ],
+    steps: [
+      "Cook pasta al dente according to package directions, in generously-salted water.",
+      "Meanwhile, heat olive oil (or melt butter) in a large saute pan over medium-high heat. Add garlic and saute one minute, stirring occasionally, until fragrant. Sprinkle with flour, and stir to combine. Saute for an additional minute to cook the flour, stirring occasionally.",
+      "Slowly add broth, whisking to combine until smooth. Whisk in milk, and bring the mixture to a simmer. Let cook for an additional minute until thickened, then stir in Parmesan cheese, salt and pepper until the cheese melted. Reduce heat to medium-low until pasta is cooked.",
+      "Drain pasta, then immediately add pasta to the saute pan with alfredo sauce. Toss to combine. Serve topped with chopped fresh parsley if desired."
+    ],
+    notes: "Plenty of add-on options: chicken, beans, peppers, onions, etc."
+  },
+
+  {
+    id: "cheddar-mac-cheese-with-baked-bbq-tofu",
+    title: "Cheddar Mac & Cheese with Baked BBQ Tofu",
+    category: "Pasta",
+    note: "",
+    prep: "30 min", cook: "40 min", serves: "4", difficulty: "Medium",
+    ingredients: [
+      "14 oz package extra-firm tofu",
+      "½ cup barbecue sauce, divided",
+      "8 oz elbow macaroni, cooked according to package",
+      "2 cups reduced-fat milk",
+      "¼ cup unsalted butter",
+      "¼ cup all-purpose flour",
+      "1 ½ cup shredded smoked cheddar cheese",
+      "salt and pepper, to taste"
+    ],
+    steps: [
+      "Preheat oven to 400°F.",
+      "Cut the tofu into 1-inch cubes. Transfer it to a bowl and toss it with ¼ cup of the barbecue sauce, then place it on the parchment-lined baking sheet. Bake the tofu for 20-30 minutes, or until it's browned on the edges, stirring halfway through cooking time. Put the tofu back in the bowl and toss it with the remaining barbecue sauce.",
+      "While the tofu is baking, start the mac & cheese. Heat the milk in a small saucepan over medium heat until warm, then reduce heat to low. Stir occasionally to prevent film from forming.",
+      "In a large saucepan, melt the butter over medium heat. Add the flour and whisk it into the butter. Continue to whisk until the mixture is golden brown, 3-5 minutes.",
+      "Slowly pour the warmed milk into the flour mixture, whisking constantly. Once the sauce is smooth, let it continue to cook until it's slightly thickened, about 3 minutes, continuing to whisk constantly.",
+      "Remove the sauce from heat and whisk in the smoked cheddar. Fold in the macaroni, then season with salt and pepper to taste.",
+      "Divide the mac & cheese into 4 bowls, then top each one with ¼ of the baked tofu."
+    ],
+    notes: "Can swap buffalo sauce on the tofu."
+  },
+
+
+  {
+    id: "stovetop-macaroni",
+    title: "Stovetop Macaroni",
+    category: "Pasta",
+    note: "Only three ingredients!",
+    prep: "0 min", cook: "15 min", serves: "2", difficulty: "Easy",
+    ingredients: [
+      "6 ounces elbow macaroni",
+      "Salt",
+      "6 ounces evaporated milk",
+      "6 ounces grated mild or medium cheddar cheese, or any good melting cheese, such as Fontina, Gruyère, or Jack"
+    ],
+    steps: [
+      "Place macaroni in a medium saucepan or skillet and add just enough cold water to cover. Add a pinch of salt and bring to a boil over high heat, stirring frequently. Continue to cook, stirring, until water has been almost completely absorbed and macaroni is just shy of al dente, about 6 minutes.",
+      "Immediately add evaporated milk and bring to a boil. Add cheese. Reduce heat to low and cook, stirring continuously, until cheese is melted and liquid has reduced to a creamy sauce, about 2 minutes longer. Season to taste with more salt and serve immediately."
+    ],
+    notes: "Additions: hot sauce, mustard powder, butter, black pepper."
+  },
+
+
+  {
+    id: "baked-ziti",
+    title: "Baked Ziti",
+    category: "Pasta",
+    note: "",
+    prep: "20 min", cook: "1 hr", serves: "8", difficulty: "Easy",
+    ingredients: [
+      "1 lb ziti pasta",
+      "1 package meatless crumbles",
+      "2 tablespoons olive oil",
+      "1 onion diced",
+      "3 cloves garlic minced",
+      "25 oz marinara sauce",
+      "14.5 oz petite diced tomatoes",
+      "1 cup water",
+      "1 teaspoon dried basil",
+      "1 teaspoon dried oregano",
+      "2 bay leaves",
+      "salt to taste",
+      "black pepper to taste",
+      "8 oz fresh mozzarella cheese drained and cut into cubes",
+      "1/4 cup parmesan cheese",
+      "1 cup part skim mozzarella cheese shredded",
+      "parsley fresh, chopped, for garnish"
+    ],
+    steps: [
+      "Preheat oven to 350° F. Lightly grease a 9×13 baking dish and set aside.",
+      "Bring large pot of water to a rolling boil. Salt generously and cook ziti according to package directions for al dente. Drain and set aside.",
+      "In a deep skillet with high sides, over medium-high heat, brown the crumbles, breaking apart as it cooks.",
+      "To the cooked crumbles, add olive oil, onion, and garlic and saute until mostly tender, about 3 minutes.",
+      "Stir in diced tomatoes, marinara sauce, water, basil, oregano, bay leaves, salt, and black pepper. Stir well. Cover and simmer 30 minutes. Taste sauce and adjust seasonings if needed. Remove bay leaves.",
+      "Add cooked ziti to sauce and stir to coat. Add in fresh mozzarella and parmesan cheese. Stir to melt slightly.",
+      "Pour into baking dish and sprinkle with 1 cup shredded mozzarella cheese. Cover with lightly greased foil and bake for 20-30 minutes or until hot and bubbling.",
+      "Top with fresh chopped parsley (optional) and serve hot."
+    ],
+    notes: ""
+  },
+
+  {
+    id: "one-pot-cajun-chicken-pasta",
+    title: "One Pot Cajun Chicken Pasta",
+    category: "Pasta",
+    note: "",
+    prep: "20min", cook: "20 min", serves: "6", difficulty: "Easy",
+    ingredients: [
+      "1 1/2 Tbsp olive oil, divided",
+      "1 package frozen meatless chicken",
+      "1 1/2 Tbsp cajun seasoning",
+      "1 medium red bell pepper, sliced into strips, about 2-inches long",
+      "1 medium yellow bell pepper, sliced into strips, about 2-inches long",
+      "1 small (5 - 6 oz) red onion, halved and thinly sliced",
+      "2 garlic cloves, minced (2 tsp)",
+      "2 (14.5 oz) cans low-sodium chicken broth",
+      "1 (14.5 oz) can fire roasted diced tomatoes",
+      "3/4 cup heavy cream, divided",
+      "12 oz. penne pasta (recommend Barilla for consistency)",
+      "2 tsp cornstarch, mixed with 1 Tbsp water",
+      "3/4 cup finely shredded parmesan cheese",
+      "3 Tbsp minced fresh parsley",
+      "Salt and freshly ground black pepper, to taste"
+    ],
+    steps: [
+      "Heat 1 Tbsp olive oil in a large pot over medium-high heat.",
+      "Toss chicken with 1/2 Tbsp cajun seasoning. Add to pot in a single layer.",
+      "Cook until browned on bottom, about 3 minutes then turn and continue to cook through, about 3 minutes longer. Transfer to a sheet of foil and wrap to keep warm.",
+      "Heat remaining 1/2 Tbsp olive oil in same pot over medium-high heat. Add bell peppers and onion and saute 3 minutes. Add garlic and remaining 1 Tbsp cajun seasoning and saute 1 minute longer.",
+      "Pour in chicken broth, tomatoes, and 1/2 cup heavy cream. Bring mixture to a boil, then add pasta.",
+      "Cook, stirring frequently until pasta is nearly tender, about 12 - 13 minutes. Add cornstarch and water mixture and cook until pasta is just tender and sauce mixture has thickened, about 1 minute longer.",
+      "Remove from heat. Toss in remaining 1/4 cup cream, parmesan, parsley and cooked chicken, and season with salt and pepper to taste. Serve warm."
+    ],
+    notes: ""
+  },
+
+
+
+];
+
+const categories = ["All", ...new Set(recipes.map(r => r.category))];
+let activeCategory = "All";
+let searchQuery = "";
+
+function renderFilters(){
+  const el = document.getElementById('filters');
+  el.innerHTML = categories.map(cat =>
+    `<button class="${cat === activeCategory ? 'active' : ''}" onclick="setFilter('${cat}')">${cat}</button>`
+  ).join('');
+}
+
+function setFilter(cat){
+  activeCategory = cat;
+  renderFilters();
+  renderGrid();
+}
+
+function renderGrid(){
+  const el = document.getElementById('grid');
+  const q = searchQuery.trim().toLowerCase();
+
+  let list = activeCategory === "All" ? recipes : recipes.filter(r => r.category === activeCategory);
+  if(q){
+    list = list.filter(r => r.title.toLowerCase().includes(q));
+  }
+
+  if(list.length === 0){
+    el.innerHTML = `<div class="no-results">No recipes match “${escapeHtml(searchQuery.trim())}”.</div>`;
+    return;
+  }
+
+  el.innerHTML = list.map(r => `
+    <a class="card" onclick="showRecipe('${r.id}')">
+      <div class="card-image">${r.title}</div>
+      <div class="card-body">
+        <span class="card-cat mono">${r.category}</span>
+        <div class="card-title">${r.title}</div>
+        <div class="card-meta mono">
+          <span>${r.prep} + ${r.cook}</span>
+          <span>Serves ${r.serves}</span>
+        </div>
+      </div>
+    </a>
+  `).join('');
+}
+
+function escapeHtml(str){
+  const div = document.createElement('div');
+  div.textContent = str;
+  return div.innerHTML;
+}
+
+function runSearch(value){
+  searchQuery = value;
+  showHome();
+  renderGrid();
+}
+
+function showHome(){
+  document.getElementById('home-view').classList.remove('hidden');
+  document.getElementById('recipe-view').classList.remove('active');
+  document.getElementById('add-view').classList.remove('active');
+  window.scrollTo(0,0);
+  history.replaceState(null, '', '#');
+}
+
+function showAddForm(){
+  document.getElementById('home-view').classList.add('hidden');
+  document.getElementById('recipe-view').classList.remove('active');
+  document.getElementById('add-view').classList.add('active');
+  window.scrollTo(0,0);
+}
+
+function slugify(str){
+  return str.toLowerCase().trim()
+    .replace(/[^a-z0-9\s-]/g, '')
+    .replace(/\s+/g, '-')
+    .replace(/-+/g, '-');
+}
+
+function jsStr(str){
+  return JSON.stringify(str || "");
+}
+
+function generateSnippet(){
+  const title = document.getElementById('f-title').value.trim();
+  const category = document.getElementById('f-category').value.trim() || "Dinner";
+  const difficulty = document.getElementById('f-difficulty').value.trim() || "Easy";
+  const note = document.getElementById('f-note').value.trim();
+  const prep = document.getElementById('f-prep').value.trim();
+  const cook = document.getElementById('f-cook').value.trim();
+  const serves = document.getElementById('f-serves').value.trim();
+  const notes = document.getElementById('f-notes').value.trim();
+
+  const ingredients = document.getElementById('f-ingredients').value
+    .split('\n').map(s => s.trim()).filter(Boolean);
+  const steps = document.getElementById('f-steps').value
+    .split('\n').map(s => s.trim()).filter(Boolean);
+
+  if(!title || ingredients.length === 0 || steps.length === 0){
+    alert('Please fill in at least a title, ingredients, and method steps.');
+    return;
+  }
+
+  const id = slugify(title);
+
+  const snippet =
+`  {
+    id: ${jsStr(id)},
+    title: ${jsStr(title)},
+    category: ${jsStr(category)},
+    note: ${jsStr(note)},
+    prep: ${jsStr(prep)}, cook: ${jsStr(cook)}, serves: ${jsStr(serves)}, difficulty: ${jsStr(difficulty)},
+    ingredients: [
+${ingredients.map(i => '      ' + jsStr(i)).join(',\n')}
+    ],
+    steps: [
+${steps.map(s => '      ' + jsStr(s)).join(',\n')}
+    ],
+    notes: ${jsStr(notes)}
+  },`;
+
+  document.getElementById('snippet-output').textContent = snippet;
+  document.getElementById('snippet-box').classList.add('visible');
+  document.getElementById('snippet-output').scrollIntoView({behavior:'smooth', block:'center'});
+}
+
+function copySnippet(){
+  const text = document.getElementById('snippet-output').textContent;
+  navigator.clipboard.writeText(text).then(() => {
+    const btn = document.querySelector('.copy-btn');
+    const original = btn.textContent;
+    btn.textContent = 'Copied!';
+    setTimeout(() => btn.textContent = original, 1500);
+  });
+}
+
+function showRecipe(id){
+  const r = recipes.find(x => x.id === id);
+  if(!r) return;
+
+  document.getElementById('r-cat').textContent = r.category;
+  document.getElementById('r-title').textContent = r.title;
+  document.getElementById('r-note').textContent = r.note;
+  document.getElementById('r-prep').textContent = r.prep;
+  document.getElementById('r-cook').textContent = r.cook;
+  document.getElementById('r-serves').textContent = r.serves;
+  document.getElementById('r-diff').textContent = r.difficulty;
+
+  document.getElementById('r-ingredients').innerHTML = r.ingredients.map((ing, i) => `
+    <div class="ingredient-item" id="ing-${i}">
+      <input type="checkbox" id="chk-${i}" onchange="toggleIngredient(${i})">
+      <label for="chk-${i}">${ing}</label>
+    </div>
+  `).join('');
+
+  document.getElementById('r-steps').innerHTML = r.steps.map(s => `
+    <div class="step">
+      <span class="step-num"></span>
+      <span class="step-text">${s}</span>
+    </div>
+  `).join('');
+
+  const notesBox = document.getElementById('r-notes-box');
+  if(r.notes){
+    notesBox.style.display = 'block';
+    document.getElementById('r-notes').textContent = r.notes;
+  } else {
+    notesBox.style.display = 'none';
+  }
+
+  document.getElementById('home-view').classList.add('hidden');
+  document.getElementById('recipe-view').classList.add('active');
+  window.scrollTo(0,0);
+  history.replaceState(null, '', '#' + id);
+}
+
+function toggleIngredient(i){
+  document.getElementById('ing-' + i).classList.toggle('checked');
+}
+
+renderFilters();
+renderGrid();
+
+// wire up the search bar: live-filter as you type, and handle Enter/submit
+const searchForm = document.getElementById('search-form');
+const searchInput = document.getElementById('search-input');
+
+searchForm.addEventListener('submit', function(e){
+  e.preventDefault();
+  runSearch(searchInput.value);
+});
+
+searchInput.addEventListener('input', function(){
+  runSearch(searchInput.value);
+});
+
+// support direct links like #chickpea-curry
+if(location.hash && location.hash.length > 1){
+  const id = location.hash.slice(1);
+  if(recipes.find(r => r.id === id)) showRecipe(id);
+}
+</script>
+
+
+
+
+
+
+
+</body>
+</html>
